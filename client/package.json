@@ -1,22 +1,9 @@
 {
-  "name": "playwright",
+  "name": "playwright-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
-    "lint": "eslint src/**/*.js src/**/*.vue"
-  },
   "dependencies": {
     "vue": "2.x"
-  },
-  "devDependencies": {
-    "eslint": "^8.27.0",
-    "eslint-plugin-vue": "^9.7.0",
-    "vite": "^3.2.3",
-    "vite-plugin-vue2": "^2.0.2",
-    "vue-template-compiler": "^2.7.13"
   }
 }

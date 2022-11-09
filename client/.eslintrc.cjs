@@ -6,11 +6,18 @@ module.exports = {
     browser: true,
     es2020: true,
   },
+  parser: 'vue-eslint-parser',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
+    parser: '@typescript-eslint/parser'
   },
-  plugins: ['vue'],
-  extends: ['eslint:recommended', 'plugin:vue/essential'],
+  plugins: ['vue', '@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:vue/essential',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   rules: {
     'accessor-pairs': 'error',
     'array-bracket-spacing': 'warn',
@@ -82,7 +89,6 @@ module.exports = {
     'no-script-url': 'error',
     'no-self-compare': 'error',
     'no-sequences': 'error',
-    'no-shadow': 'error',
     'no-shadow-restricted-names': 'error',
     'no-tabs': 'warn',
     'no-template-curly-in-string': 'error',
@@ -93,7 +99,6 @@ module.exports = {
     'no-unmodified-loop-condition': 'error',
     'no-unneeded-ternary': 'error',
     'no-unused-expressions': 'error',
-    'no-unused-vars': ['error', {args: 'none'}],
     'no-use-before-define': ['error', {functions: false}],
     'no-useless-call': 'error',
     'no-useless-computed-key': 'error',
@@ -130,6 +135,22 @@ module.exports = {
     'template-tag-spacing': 'warn',
     'unicode-bom': 'error',
     'yoda': 'error',
+
+    // https://stackoverflow.com/a/63961972
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': ['error'],
+
+    // These two rules need to work together for correct typescript linting.
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', {args: 'none', varsIgnorePattern: '^unused'}],
+
+    // Rules turned off for now
+    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-var-requires': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+
+    'vue/block-lang': ['error', {script: {lang: 'ts'}}],
   }
 };
 

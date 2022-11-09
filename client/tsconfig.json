@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "es2020",
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "experimentalDecorators": true,
+    "isolatedModules": true,
+    "noImplicitThis": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": [
+    "src/**/*.ts", "src/**/*.vue"
+  ]
+}
