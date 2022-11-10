@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "dependencies": {
-    "vue": "2.x"
+    "vue": "2.x",
+    "vuetify": "^2.6.12"
   }
 }

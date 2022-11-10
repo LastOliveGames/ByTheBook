@@ -18,6 +18,7 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
   ],
+  ignorePatterns: ['components.d.ts'],
   rules: {
     'accessor-pairs': 'error',
     'array-bracket-spacing': 'warn',

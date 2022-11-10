@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <v-app>
     <a href="https://vitejs.dev" target="_blank">
       <img src="/vite.svg" class="logo" alt="Vite logo"/>
     </a>
@@ -8,21 +8,14 @@
     </a>
     <HelloWorld msg="Vite + Vue"/>
     <GoodbyeWorld msg="world"/>
-  </div>
+  </v-app>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from '@/components/HelloWorld.vue';
-import GoodbyeWorld from '@/components/GoodbyeWorld.vue';
 
 export default class App extends Vue {
-  static $vueOptions = {
-    components: {
-      HelloWorld,
-      GoodbyeWorld
-    }
-  };
+
 }
 
 </script>
