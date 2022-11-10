@@ -27,19 +27,13 @@
 
 <script lang="ts">
 
-let foo: number = 8;
+import {prop} from '@/vue-class';
 
+export default class HelloWorld {
+  msg = prop.string();
 
-export default {
-  props: {
-    msg: String,
-  },
-  data() {
-    return {
-      count: 0,
-    };
-  },
-};
+  count = 0;
+}
 
 </script>
 

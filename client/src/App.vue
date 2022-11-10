@@ -1,24 +1,29 @@
 <template>
   <div>
     <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
+      <img src="/vite.svg" class="logo" alt="Vite logo"/>
     </a>
     <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
+      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo"/>
     </a>
-    <HelloWorld msg="Vite + Vue" />
+    <HelloWorld msg="Vite + Vue"/>
+    <GoodbyeWorld msg="world"/>
   </div>
 </template>
 
 <script lang="ts">
-
+import Vue from 'vue';
 import HelloWorld from '@/components/HelloWorld.vue';
+import GoodbyeWorld from '@/components/GoodbyeWorld.vue';
 
-export default {
-  components: {
-    HelloWorld,
-  },
-};
+export default class App extends Vue {
+  static $vueOptions = {
+    components: {
+      HelloWorld,
+      GoodbyeWorld
+    }
+  };
+}
 
 </script>
 
