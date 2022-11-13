@@ -3,7 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "scripts": {
+    "update": "yarn upgrade-interactive --latest"
+  },
   "dependencies": {
+    "firebase": "8.x",
+    "firetruss": "^5.0.0",
+    "firetruss-worker": "^2.4.3",
     "vue": "2.x",
     "vuetify": "^2.6.12"
   }

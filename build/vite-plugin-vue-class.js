@@ -43,7 +43,7 @@ function mangle(code, s) {
     `export default _vueclass_defineComponent(${className}, '${className}');\n`;
   s.prependLeft(
     classMatch.index,
-    `import {defineComponent as _vueclass_defineComponent} from '@/vue-class';\n`);
+    `import {defineComponent as _vueclass_defineComponent} from ':core/vue-class';\n`);
   s.replace(/^\s*export\s+default\s+class\s+/m, 'export class ');
   s.prependLeft(code.indexOf('\n</script>'), defaultExport);
 }

@@ -3,7 +3,7 @@
     <h1>{{ msg }}</h1>
 
     <div class="card">
-      <button type="button" @click="count++">count is {{ count }}</button>
+      <button type="button" @click="increment">count is {{ count }}</button>
       <p>
         Edit
         <code>components/HelloWorld.vue</code> to test HMR
@@ -27,12 +27,25 @@
 
 <script lang="ts">
 
-import {prop} from '@/vue-class';
+import {prop} from ':core/vue-class';
+import Vue from 'vue';
 
-export default class HelloWorld {
+export default class HelloWorld extends Vue {
   msg = prop.string();
 
-  count = 0;
+  created() {
+    this.$watch(() => this.count, () => {/* nothing */});
+    this.$connect(this.$store.$ref.child('system'));
+  }
+
+  get count() {
+    if (!this.$store.system.$ref.ready) return;
+    return this.$store.system.count ?? 0;
+  }
+
+  increment() {
+    return this.$store.system.incrementCounter();
+  }
 }
 
 </script>

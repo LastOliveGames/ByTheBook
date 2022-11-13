@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import Truss from 'firetruss';
 
 class PropPlaceholder {
   // eslint-disable-next-line no-useless-constructor, no-empty-function
@@ -37,6 +38,8 @@ const VUE_OPTIONS = {
   errorCaptured: true, render: true, renderError: true, data: true,
 };
 
+const SHIM_TRUSS_PROPS = ['$truss', '$info', '$store', '$now', '$newKey'];
+
 type ComponentClass = {new(): any, $vueOptions?: Record<string, any>};
 
 
@@ -69,11 +72,11 @@ function transferProperties(Class: ComponentClass, className: string, component:
         component.methods[name] = descriptor.value;
       }
     } else if (descriptor.get || descriptor.set) {
-      // const getter = Truss.computedPropertyStats.wrap(prop.get, className, name);
+      const get = Truss.computedPropertyStats.wrap(descriptor.get!, className, name);
       if (descriptor.set) {
-        component.computed[name] = {get: descriptor.get, set: descriptor.set};
+        component.computed[name] = {get, set: descriptor.set};
       } else {
-        component.computed[name] = descriptor.get;
+        component.computed[name] = get;
       }
     }
   }
@@ -103,11 +106,12 @@ function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
   // Shim in properties from the actual Vue instance onto the component class we're instantiating
   // right now, so that the subclass's constructor can access them.
   const proto = Class.prototype;
-  // if (!proto.$truss) {
-  //   for (const prop of SHIM_TRUSS_PROPS) {
-  //     Object.defineProperty(proto, prop, Object.getOwnPropertyDescriptor(Vue.prototype, prop));
-  //   }
-  // }
+  if (!proto.$truss) {
+    for (const propName of SHIM_TRUSS_PROPS) {
+      const descriptor = Object.getOwnPropertyDescriptor(Vue.prototype, propName)!;
+      Object.defineProperty(proto, propName, descriptor);
+    }
+  }
   const keys = Object.getOwnPropertyNames(vue).filter(
     key => key.charAt(0) !== '_' && Object.hasOwnProperty.call(proto, key)
   );
@@ -131,7 +135,9 @@ function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
   for (const key of keys) delete proto[key];
   const data = {};
   for (const key in instance) {
-    if (Object.hasOwnProperty.call(instance, key) && !(instance[key] instanceof PropPlaceholder)) {
+    if (Object.hasOwnProperty.call(instance, key) && !(
+      key in vue || key === '_data' || instance[key] instanceof PropPlaceholder
+    )) {
       data[key] = instance[key];
     }
   }

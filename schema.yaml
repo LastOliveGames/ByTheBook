@@ -1,2 +1,5 @@
 root:
-  .read/write: false
+  .read/write: true
+  system:
+    count: number
+

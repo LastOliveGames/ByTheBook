@@ -6,6 +6,9 @@
     "forceConsistentCasingInFileNames": true,
     "strict": false,
     "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
     "allowJs": true,
     "isolatedModules": true,
     "noImplicitThis": true,
@@ -13,10 +16,11 @@
     "noEmit": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      ":*": ["src/*"]
     }
   },
   "include": [
-    "src/**/*.ts", "src/**/*.js", "src/**/*.vue"
+    "src/**/*.ts", "src/**/*.js", "src/**/*.vue",
+    ".eslintrc.cjs", "vite.config.js"
   ]
 }

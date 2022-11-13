@@ -2,7 +2,8 @@
   "name": "functions",
   "scripts": {
     "shell": "firebase functions:shell",
-    "logs": "firebase functions:log"
+    "logs": "firebase functions:log",
+    "update": "yarn upgrade-interactive --latest"
   },
   "engines": {
     "node": "16"
@@ -13,7 +14,8 @@
     "firebase-functions": "^4.0.2"
   },
   "devDependencies": {
-    "firebase-functions-test": "^3.0.0"
+    "firebase-functions-test": "^3.0.0",
+    "jest": "^29.3.1"
   },
   "private": true
 }

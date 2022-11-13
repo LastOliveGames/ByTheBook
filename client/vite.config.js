@@ -5,8 +5,9 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 import vueClass from '../build/vite-plugin-vue-class';
 import components from 'unplugin-vue-components/vite';
 import {VuetifyResolver as vuetifyResolver} from 'unplugin-vue-components/resolvers';
-import checker from 'vite-plugin-checker';
+import {checker} from 'vite-plugin-checker';
 import fireplan from '../build/vite-plugin-fireplan';
+import trussModels from '../build/vite-plugin-truss-models';
 
 export default defineConfig({
   plugins: [
@@ -17,6 +18,7 @@ export default defineConfig({
       eslint: {lintCommand: 'eslint --ext .js,.ts,.vue src ../functions/src'}
     }),
     fireplan('../schema.yaml'),
+    trussModels(),
     vueClass(),
     tsconfigPaths({loose: true}),
     vue(),

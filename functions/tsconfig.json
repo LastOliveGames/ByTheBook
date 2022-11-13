@@ -9,6 +9,6 @@
     "target": "esnext"
   },
   "include": [
-    "src", ".estlinrc.cjs"
+    "src", ".eslintrc.cjs"
   ]
 }

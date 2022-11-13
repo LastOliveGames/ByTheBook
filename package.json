@@ -9,18 +9,20 @@
     "build": "vite build client",
     "preview": "vite preview client",
     "install-all": "yarn install && yarn --cwd client install && yarn --cwd functions install",
-    "update": "yarn upgrade-interactive --latest && yarn --cwd client upgrade-interactive --latest && yarn --cwd functions upgrade-interactive --latest"
+    "update": "yarn upgrade-interactive --latest"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-vue2": "^2.0.1",
     "eslint": "^8.27.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-vue": "^9.7.0",
     "firebase-tools": "^11.16.0",
     "fireplan": "^3.1.0",
     "magic-string": "^0.26.7",
+    "recursive-readdir": "^2.2.3",
     "sass": "~1.32",
     "typescript": "^4.8.4",
     "unplugin-vue-components": "^0.22.9",
