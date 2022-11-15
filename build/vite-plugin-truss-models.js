@@ -1,12 +1,25 @@
 import recursiveReadDir from 'recursive-readdir';
 import {normalizePath} from 'vite';
 import {resolve} from 'path';
+import picomatch from 'picomatch';
 
 export default function trussModels() {
   const moduleId = normalizePath(resolve('client/src/core/truss-models.ts'));
+  const matches = picomatch(normalizePath(resolve('client/src/models')) + '/**');
 
   return {
     name: 'truss-models',
+    configureServer({watcher, moduleGraph, ws}) {
+      function checkModel(path) {
+        const module = moduleGraph.getModuleById(moduleId);
+        if (module && matches(path)) {
+          moduleGraph.invalidateModule(module);
+          ws.send({type: 'full-reload', path: '*'});
+        }
+      }
+      watcher.on('add', checkModel);
+      watcher.on('remove', checkModel);
+    },
     async transform(code, id) {
       if (id !== moduleId) return;
       const paths = await recursiveReadDir('client/src/models');

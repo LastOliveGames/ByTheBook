@@ -6,7 +6,7 @@ import {transformFile} from 'fireplan';
 export default function fireplan(path) {
   return {
     name: 'vite-plugin-fireplan',
-    configureServer({watcher, config: {root, logger}}) {
+    configureServer({watcher, config: {root}}) {
       const normalizedPath = normalizePath(resolve(root, path));
       const matches = picomatch(normalizedPath);
       function checkTranspile(changedPath) {
