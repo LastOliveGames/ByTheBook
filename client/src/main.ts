@@ -2,7 +2,9 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import './style.css';
 import App from './App.vue';
-import ':core/truss-models';  // eslint-disable-line import/no-unresolved
+import truss from ':core/truss-models';
+
+(window as any).truss = truss;
 
 Vue.use(Vuetify);
 

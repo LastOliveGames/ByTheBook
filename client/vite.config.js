@@ -10,11 +10,16 @@ import fireplan from '../build/vite-plugin-fireplan';
 import trussModels from '../build/vite-plugin-truss-models';
 
 export default defineConfig({
+  build: {
+    chunkSizeWarningLimit: 2000,
+    sourcemap: true,
+  },
   plugins: [
     inspect(),
     checker({
+      enabledBuild: true,
       vueTsc: true,
-      typescript: {root: 'functions', buildMode: true},
+      typescript: {root: '../functions', buildMode: true},  // doesn't run in build mode?
       eslint: {lintCommand: 'eslint --ext .js,.ts,.vue src ../functions/src'}
     }),
     fireplan('../schema.yaml'),

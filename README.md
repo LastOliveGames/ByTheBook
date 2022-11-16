@@ -8,3 +8,5 @@ A game of audio storytelling.
 2. Clone the repo and change to its directory.
 3. Run `yarn install-all`.
 3. Run `yarn dev` to spin up all the Firebase emulators and Vite, then access the app at [http://localhost:5173](http://localhost:5173/) and the emulators at [http://localhost:4000](http://localhost:4000/).
+
+You can also run `yarn build` to build a dist bundle, and `yarn preview` to serve it via the Firebase hosting emulator.

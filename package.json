@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "rm -rf firebase-export-* && firebase emulators:exec \"yarn vite-dev\" --project=demo-dev --import=./emulator_data --export-on-exit --ui --only=auth,functions,database,storage",
-    "vite-dev": "vite client",
-    "build": "vite build client",
-    "preview": "vite preview client",
+    "vite-dev": "cd client && vite && cd ..",
+    "build": "cd client && vite build && cd ../functions && tsc && cd ..",
+    "preview": "rm -rf firebase-export-* && firebase emulators:exec \"sleep 999d\" --project=demo-dev --import=./emulator_data --export-on-exit --ui",
     "install-all": "yarn install && yarn --cwd client install && yarn --cwd functions install",
     "update": "yarn upgrade-interactive --latest"
   },

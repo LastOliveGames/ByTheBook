@@ -29,4 +29,5 @@ if (dev) {
 
 const truss = new Truss(firebaseConfig.databaseUrl);
 Vue.use(Truss.ComponentPlugin, {truss});
+
 export default truss;

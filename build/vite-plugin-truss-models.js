@@ -4,11 +4,12 @@ import {resolve} from 'path';
 import picomatch from 'picomatch';
 
 export default function trussModels() {
-  const moduleId = normalizePath(resolve('client/src/core/truss-models.ts'));
-  const matches = picomatch(normalizePath(resolve('client/src/models')) + '/**');
+  const moduleId = normalizePath(resolve('src/core/truss-models.ts'));
+  const matches = picomatch(normalizePath(resolve('src/models')) + '/**');
 
   return {
     name: 'truss-models',
+
     configureServer({watcher, moduleGraph, ws}) {
       function checkModel(path) {
         const module = moduleGraph.getModuleById(moduleId);
@@ -20,18 +21,21 @@ export default function trussModels() {
       watcher.on('add', checkModel);
       watcher.on('remove', checkModel);
     },
-    async transform(code, id) {
+
+    async transform(unused, id) {
       if (id !== moduleId) return;
-      const paths = await recursiveReadDir('client/src/models');
+      const paths = await recursiveReadDir('src/models');
       paths.sort();
       const importLines = [`import truss from './truss';`];
       const mapLines = [];
       for (let i = 0; i < paths.length; i++) {
         const path = normalizePath(paths[i]);
-        importLines.push(`import m${i} from '${path.replace(/^client\/src/, '..')}';`);
+        importLines.push(`import m${i} from '${path.replace(/^src/, '..')}';`);
         mapLines.push(`  '${path.replace(/^.*?\/models/, '').replace(/\.[^.]+$/, '')}': m${i},`);
       }
-      return importLines.join('\n') + '\ntruss.mount({\n' + mapLines.join('\n') + '\n});\n';
+      const code = importLines.join('\n') + '\ntruss.mount({\n' + mapLines.join('\n') + '\n});\n' +
+        'export default truss;\n';
+      return {code, map: null};
     }
   };
 }

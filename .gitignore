@@ -104,6 +104,9 @@ dist-ssr
 # TernJS port file
 .tern-port
 
+# Firebase cache files
+.firebase/
+
 # Generated files
 schema.json
 
