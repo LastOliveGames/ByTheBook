@@ -1,6 +1,6 @@
 # Playwright
 
-A game of audio storytelling.
+A game of audio storytelling.  [Join us on Discord](https://discord.gg/ENJA65ZymB)!
 
 ## How to set up your development environment
 
