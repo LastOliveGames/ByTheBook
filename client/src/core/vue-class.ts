@@ -2,30 +2,47 @@ import Vue from 'vue';
 import Truss from 'firetruss';
 
 class PropPlaceholder {
-  // eslint-disable-next-line no-useless-constructor, no-empty-function
-  constructor(readonly type: any, readonly defaultValue?: any, readonly validator?: any) {}
+  // eslint-disable-next-line no-useless-constructor
+  constructor(
+    readonly type: any, readonly defaultValue?: any, readonly required?: boolean,
+    readonly validator?: any
+  ) { }  // eslint-disable-line no-empty-function
 }
 
-export function prop(type, defaultValue?, validator?): any {
-  return new PropPlaceholder(type, defaultValue, validator);
+export function prop(type, defaultValue?, required?, validator?): any {
+  return new PropPlaceholder(type, defaultValue, required, validator);
 }
+
+prop.required = {
+  string(defaultValue?: string): string {
+    return new PropPlaceholder(String, defaultValue, true) as unknown as string;
+  },
+  number(defaultValue?: number): number {
+    return new PropPlaceholder(Number, defaultValue, true) as unknown as number;
+  },
+  boolean(defaultValue?: boolean): boolean {
+    return new PropPlaceholder(Boolean, defaultValue, true) as unknown as boolean;
+  },
+  object <T>(klass?: {new(): T}, defaultValue?: any): T {
+    return new PropPlaceholder(klass ?? Object, defaultValue, true) as unknown as T;
+  },
+  array <T>(defaultValue?: T[]): T[] {
+    return new PropPlaceholder(Array, defaultValue, true) as unknown as T[];
+  },
+};
 
 prop.string = function(defaultValue?: string): string {
   return new PropPlaceholder(String, defaultValue) as unknown as string;
 };
-
 prop.number = function(defaultValue?: number): number {
   return new PropPlaceholder(Number, defaultValue) as unknown as number;
 };
-
 prop.boolean = function(defaultValue?: boolean): boolean {
   return new PropPlaceholder(Boolean, defaultValue) as unknown as boolean;
 };
-
 prop.object = function<T>(klass?: {new(): T}, defaultValue?: any): T {
   return new PropPlaceholder(klass ?? Object, defaultValue) as unknown as T;
 };
-
 prop.array = function<T>(defaultValue?: T[]): T[] {
   return new PropPlaceholder(Array, defaultValue) as unknown as T[];
 };
@@ -95,7 +112,8 @@ function collectPropsFromConstructor(Class: ComponentClass) {
         defaultValue = function() {return structuredClone(originalValue);};
       }
       props[key] = {
-        type: placeholder.type || Object, default: defaultValue, validator: placeholder.validator
+        type: placeholder.type || Object, default: defaultValue, validator: placeholder.validator,
+        required: placeholder.required
       };
     }
   }

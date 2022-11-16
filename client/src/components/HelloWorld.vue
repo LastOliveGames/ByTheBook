@@ -31,7 +31,7 @@ import {prop} from ':core/vue-class';
 import Vue from 'vue';
 
 export default class HelloWorld extends Vue {
-  msg = prop.string();
+  msg = prop.required.string();
 
   created() {
     this.$watch(() => this.count, () => {/* nothing */});
