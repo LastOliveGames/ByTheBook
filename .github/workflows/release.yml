@@ -7,9 +7,20 @@ jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: yarn install-all && yarn build
-      - uses: w9jds/firebase-action@master
+      - uses: actions/checkout@v3
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile
+        working-directory: client
+      - run: yarn install --frozen-lockfile
+        working-directory: functions
+      - run: yarn build
+      - uses: w9jds/firebase-action@v11.16.0
         with:
           args: deploy
         env:
