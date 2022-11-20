@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Truss from 'firetruss';
 
+export {Vue};
+
 class PropPlaceholder {
   // eslint-disable-next-line no-useless-constructor
   constructor(
@@ -48,12 +50,14 @@ prop.array = function<T>(defaultValue?: T[]): T[] {
 };
 
 
-const VUE_OPTIONS = {
+const VUE_OPTIONS = new Set([
   // Component hooks
-  beforeCreate: true, created: true, beforeMount: true, mounted: true, beforeUpdate: true,
-  updated: true, activated: true, deactivated: true, beforeDestroy: true, destroyed: true,
-  errorCaptured: true, render: true, renderError: true, data: true,
-};
+  'beforeCreate', 'created', 'beforeMount', 'mounted', 'beforeUpdate',
+  'updated', 'activated', 'deactivated', 'beforeDestroy', 'destroyed',
+  'errorCaptured', 'render', 'renderError', 'data',
+  // Vue Router hooks
+  'beforeRouteEnter', 'beforeRouteUpdate', 'beforeRouteLeave'
+]);
 
 const SHIM_TRUSS_PROPS = ['$truss', '$info', '$store', '$now', '$newKey'];
 
@@ -83,7 +87,7 @@ function transferProperties(Class: ComponentClass, className: string, component:
       if (typeof descriptor.value !== 'function') {
         throw new Error(`${className}.${name} is not a function`);
       }
-      if (VUE_OPTIONS[name]) {
+      if (VUE_OPTIONS.has(name)) {
         component[name] = descriptor.value;
       } else {
         component.methods[name] = descriptor.value;

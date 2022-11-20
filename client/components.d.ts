@@ -5,8 +5,20 @@ export {}
         
 declare module 'vue' {
   export interface GlobalComponents {
+    App: typeof import('./src/components/app.vue')['default']
     GoodbyeWorld: typeof import('./src/components/GoodbyeWorld.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    HomePage: typeof import('./src/components/home-page.vue')['default']
+    NotFoundPage: typeof import('./src/components/not-found-page.vue')['default']
+    PlaybillPage: typeof import('./src/components/playbill/playbill-page.vue')['default']
+    PlayEditorPage: typeof import('./src/components/play-editor/play-editor-page.vue')['default']
     VApp: typeof import('vuetify/lib')['VApp']
+    VAppBar: typeof import('vuetify/lib')['VAppBar']
+    VAppBarTitle: typeof import('vuetify/lib')['VAppBarTitle']
+    VCard: typeof import('vuetify/lib')['VCard']
+    VCol: typeof import('vuetify/lib')['VCol']
+    VFooter: typeof import('vuetify/lib')['VFooter']
+    VMain: typeof import('vuetify/lib')['VMain']
+    VRow: typeof import('vuetify/lib')['VRow']
   }
 }

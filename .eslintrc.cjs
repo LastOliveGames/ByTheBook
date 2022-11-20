@@ -42,7 +42,7 @@ module.exports = {
     'key-spacing': ['warn', {mode: 'minimum'}],
     'keyword-spacing': 'warn',
     'linebreak-style': 'warn',
-    'lines-between-class-members': 'warn',
+    'lines-between-class-members': ['warn', 'always', {exceptAfterSingleLine: true}],
     'max-len': ['warn', {
       code: 100,
       ignoreUrls: true,

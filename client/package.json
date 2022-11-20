@@ -11,6 +11,7 @@
     "firetruss": "^5.0.0",
     "firetruss-worker": "^2.4.3",
     "vue": "2.x",
+    "vue-router": "3.x",
     "vuetify": "^2.6.12"
   }
 }
