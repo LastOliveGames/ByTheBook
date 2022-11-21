@@ -1,5 +1,72 @@
+functions:
+  - userid: auth.uid
+  - isUser(userKey): root.users.hasChild(userKey)
+  - currentUserKey: string && (userid == next || userid == 'server')
+  - userKey: string && (userid == 'server' || isUser(next))
+
+  - isPlay(key): root.plays.hasChild(key)
+  - isPublisher(key): root.publishers.hasChild(key)
+  - isEditor(playKey):
+      root.plays[playKey].people[userid].role == 'editor' ||
+      root.publishers[root.plays[playKey].core.publisherKey].people[userid] == 'editor'
+
+  - currentTimestamp: number && (now - next > -10000 && now - next < 10000 || userid == 'server')
+  - monotonicallyIncreasing: prev == null || next >= prev || userid == 'server'
+
+
 root:
-  .read/write: true
-  system:
-    count: number
+  .read/write: userid == 'server'
+
+  plays:
+    $playKey:
+      .ref: play
+      .read: data.people[userid].role == 'author' || isEditor($playKey)
+      .write: isEditor($playKey)
+      core:
+        .read: play.publication != null
+        title: required string
+        publisherKey: string && isPublisher(next)
+        coverArt: string  # URL
+      playbill:
+        .read: play.publication !== null
+        numActs: required number && next >= 1
+        teaser: string
+      publication:
+        lastTimestamp: required number
+        lastVersion: required string
+      people:
+        $userid:
+          role: required oneOf('author', 'editor')
+      molds:
+        $moldKey:
+          name: required string
+          acts:
+            $actKey:  # a1, a2, ...
+              introBeatKey: string && play.beats.hasChild(next)
+              outroBeatKey: string && play.beats.hasChild(next)
+      beats:
+        $beatKey:
+          name: required string
+
+
+  publishers:
+    $publisherKey:
+      name: required string
+      people:
+        $userid:
+          role: required oneOf('editor')
+
+  users:
+    $userid:
+      playsIndex:
+        .read/write: userid === $userid
+        $playKey:
+          .value: isPlay($playKey)
+          relation: required oneOf('player', 'contributor', 'author', 'editor', 'publisher')
+          archived: boolean
+      rateLimiting:
+        playCreation:
+          lastTimestamp: required number
+          lastPlayKey: required string
+
 

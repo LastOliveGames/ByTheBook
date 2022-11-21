@@ -1,7 +1,8 @@
 <template>
   <v-app width="100%">
     <v-app-bar app>
-      <v-app-bar-title>Playwright</v-app-bar-title>
+      <v-img src="https://picsum.photos/seed/playwright/150/150/?grayscale" :max-width="64"/>
+      <v-toolbar-title class="ml-4">Playwright</v-toolbar-title>
     </v-app-bar>
     <v-main>
       <router-view></router-view>

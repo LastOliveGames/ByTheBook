@@ -449,9 +449,9 @@ firetruss-worker@^2.4.3:
   integrity sha512-c2tre/uRGOn+pWJXGcERrX/qJmCHzq2y5nV21zkqCN/Qsb2wsk+1IX8S4iIlmmekdWzLZk4P1IFYQiVT/C687g==
 
 firetruss@^5.0.0:
-  version "5.2.3"
-  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.3.tgz#9758bdafe70386943535da5ced40286e9596a29b"
-  integrity sha512-VolUC1ZWPmQzCQ7svVrOW6ckKoXJlNgyp0e7qO7R3tozOcZ0AKkrWNmqrGRpbntGaE+KQ/O8fdCUJiX1OQmBGw==
+  version "5.2.7"
+  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.7.tgz#1b6b1e4b0bec377b6f01acb8b9b9d3b6b1e5a6a0"
+  integrity sha512-3UeDKC9eLicJQAjLDXkNhCjO4odPIC5B71iRpm6WKBaB4+ZkNJ7A39ty4a0u2dmy3Vl5B1njUiQ9b7DXW+vgKA==
   dependencies:
     lodash "4"
     performance-now "2"

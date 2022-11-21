@@ -25,6 +25,9 @@ prop.required = {
   boolean(defaultValue?: boolean): boolean {
     return new PropPlaceholder(Boolean, defaultValue, true) as unknown as boolean;
   },
+  function <T>(defaultValue?: T): T {
+    return new PropPlaceholder(Function, defaultValue, true) as unknown as T;
+  },
   object <T>(klass?: {new(): T}, defaultValue?: any): T {
     return new PropPlaceholder(klass ?? Object, defaultValue, true) as unknown as T;
   },
@@ -44,6 +47,9 @@ prop.boolean = function(defaultValue?: boolean): boolean {
 };
 prop.object = function<T>(klass?: {new(): T}, defaultValue?: any): T {
   return new PropPlaceholder(klass ?? Object, defaultValue) as unknown as T;
+};
+prop.function = function<T>(defaultValue?: T): T {
+  return new PropPlaceholder(Function, defaultValue) as unknown as T;
 };
 prop.array = function<T>(defaultValue?: T[]): T[] {
   return new PropPlaceholder(Array, defaultValue) as unknown as T[];

@@ -1,6 +1,6 @@
 import recursiveReadDir from 'recursive-readdir';
 import {normalizePath} from 'vite';
-import {resolve} from 'path';
+import {basename, resolve} from 'path';
 import picomatch from 'picomatch';
 
 export default function trussModels() {
@@ -31,7 +31,7 @@ export default function trussModels() {
       for (let i = 0; i < paths.length; i++) {
         const path = normalizePath(paths[i]);
         importLines.push(`import m${i} from '${path.replace(/^src/, '..')}';`);
-        mapLines.push(`  '${path.replace(/^.*?\/models/, '').replace(/\.[^.]+$/, '')}': m${i},`);
+        mapLines.push(`  '/${basename(path).replace(/\.[^.]+$/, '').replace(/\./g, '/')}': m${i},`);
       }
       const code = importLines.join('\n') + '\ntruss.mount({\n' + mapLines.join('\n') + '\n});\n' +
         'export default truss;\n';
