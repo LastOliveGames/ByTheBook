@@ -4,6 +4,7 @@
     "module": "es2020",
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
     "strict": false,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,

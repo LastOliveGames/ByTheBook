@@ -5,9 +5,10 @@ const dev = window.location.hostname === '127.0.0.1' || window.location.hostname
 
 const firebaseConfig = dev ?
   {
-    apiKey: 'demo-dev',
     projectId: 'demo-dev',
-    appId: 'demo-dev'
+    apiKey: 'demo-dev',
+    appId: 'demo-dev',
+    databaseURL: 'http://localhost:9000/?ns=demo-dev',
   } : {
     apiKey: 'AIzaSyDhxbwYETvut5Zi4AjYZCpD_vUVs22Nsnw',
     authDomain: 'playwright-prod.firebaseapp.com',
@@ -18,14 +19,16 @@ const firebaseConfig = dev ?
 
 const worker = new Worker(new URL('../workers/truss-worker', import.meta.url), {type: 'module'});
 Truss.connectWorker(worker, firebaseConfig);
+Truss.preExpose('selectApp');
 Truss.preExpose('useEmulators');
 Truss.preExpose('callServerFunction');
+Truss.worker.selectApp(firebaseConfig.databaseURL);
 if (dev) {
   console.log('Running in dev mode using Firebase emulators');
   Truss.worker.useEmulators();
 }
 
-const truss = new Truss(firebaseConfig.databaseURL ?? 'http://localhost:9000/');
+const truss = new Truss(firebaseConfig.databaseURL);
 Vue.use(Truss.ComponentPlugin, {truss});
 
 export default truss;

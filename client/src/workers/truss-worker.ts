@@ -8,16 +8,22 @@ import Fireworker from 'firetruss-worker';
 
 (self as any).firebase = firebase;
 
-Fireworker.expose(function useEmulators() {
-  firebase.database().useEmulator('localhost', 9000);
-  firebase.auth().useEmulator('http://localhost:9099');
-  firebase.storage().useEmulator('localhost', 9199);
-  firebase.functions().useEmulator('localhost', 5001);
+let app: ReturnType<typeof firebase.app>;
+
+Fireworker.expose(function selectApp(databaseURL) {
+  app = firebase.app(databaseURL);
+}, 'selectApp');
+
+Fireworker.expose(function useEmulators(databaseURL) {
+  app.database().useEmulator('localhost', 9000);
+  app.auth().useEmulator('http://localhost:9099');
+  app.storage().useEmulator('localhost', 9199);
+  app.functions().useEmulator('localhost', 5001);
 }, 'useEmulators');
 
 const functions = {};
 
 Fireworker.expose(function callServerFunction(name: string, options: any) {
-  if (!functions[name]) functions[name] = firebase.functions().httpsCallable(name);
+  if (!functions[name]) functions[name] = app.functions().httpsCallable(name);
   return functions[name](options).then(result => result.data);
 }, 'callServerFunction');

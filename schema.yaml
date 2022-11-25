@@ -1,18 +1,27 @@
 functions:
   - userid: auth.uid
-  - isUser(userKey): root.users.hasChild(userKey)
   - currentUserKey: string && (userid == next || userid == 'server')
   - userKey: string && (userid == 'server' || isUser(next))
 
   - isPlay(key): root.plays.hasChild(key)
   - isPublisher(key): root.publishers.hasChild(key)
-  - isEditor(playKey):
-      root.plays[playKey].people[userid].role == 'editor' ||
-      root.publishers[root.plays[playKey].core.publisherKey].people[userid] == 'editor'
+  - isUser(userKey): root.users.hasChild(userKey)
+  - isOwner(playKey): >
+      root.plays[playKey].team[userid].role == 'owner' ||
+      root.publishers[root.plays[playKey].playbill.core.publisherKey].members[userid] == 'editor'
+  - isEditor(playKey): root.plays[playKey].team[userid].role == 'editor' || isOwner(playKey)
+  - isAuthor(playKey): root.plays[playKey].team[userid].role == 'author' || isEditor(playKey)
+  - isPlaytester(playKey): >
+      root.plays[playKey].team[userid].role == 'playtester' || isAuthor(playKey)
 
   - currentTimestamp: number && (now - next > -10000 && now - next < 10000 || userid == 'server')
   - monotonicallyIncreasing: prev == null || next >= prev || userid == 'server'
 
+
+types:
+  lock: &Lock
+    userKey: required string && isUser(next) && (prev == null || next == null || prev == next)
+    timestamp: required currentTimestamp && (prev == null || next == null || prev == next)
 
 root:
   .read/write: userid == 'server'
@@ -20,50 +29,146 @@ root:
   plays:
     $playKey:
       .ref: play
-      .read: data.people[userid].role == 'author' || isEditor($playKey)
-      .write: isEditor($playKey)
-      core:
-        .read: play.publication != null
-        title: required string
-        publisherKey: string && isPublisher(next)
-        coverArt: string  # URL
+      .read: isPlaytester($playKey) || isAuthor($playKey) || isEditor($playKey)
+      team:
+        .write: isOwner($playKey)
+        $userKey:
+          role: required oneOf('contributor', 'playtester', 'author', 'editor', 'owner')
       playbill:
-        .read: play.publication !== null
+        .value: required
+        .write: data.lock.userKey == userid
+        lock:
+          <<: *Lock
+          .write: isEditor($playKey)
+        core:
+          .value: required
+          title: required string
+          publisherKey: required string && isPublisher(next)
+          thumbUrl: string
         numActs: required number && next >= 1
         teaser: string
-      publication:
-        lastTimestamp: required number
-        lastVersion: required string
-      people:
-        $userid:
-          role: required oneOf('author', 'editor')
-      molds:
-        $moldKey:
+        art: &Art
+          key: required string
+          imageUrl: required string
+          prompt: string
+          generator: string
+        remixes:  # TODO: figure out how to track remixes
+          $remixKey:  # always has 'base' for the first, original mix
+            name: required string
+      cast:
+        .value: required next.hasChild('narrator')
+        .write: data.lock.userKey == userid
+        lock:
+          <<: *Lock
+          .write: isEditor($playKey)
+        $castKey:  # always has 'narrator'
+          name: >
+            required string && ($castKey == 'narrator' ? next == 'Narrator' : true)
+          alias: string
+          voice:
+            name: required string
+            rate: number
+            pitch: number
+          stances:
+            .value: required next.hasChild('neutral')
+            $stanceKey:  # always has 'neutral'
+              name: >
+                required string && ($stanceKey == 'neutral' ? next == 'neutral' : true)
+              inflection: string  # defaults to 'neutral'
+              art: *Art
+      sounds:
+        .write: isAuthor($playKey) && prev == null
+        $soundKey:
+          .write: data.lock.userKey == userid
+          lock:
+            <<: *Lock
+            .write: isAuthor($playKey)
           name: required string
-          acts:
-            $actKey:  # a1, a2, ...
-              introBeatKey: string && play.beats.hasChild(next)
-              outroBeatKey: string && play.beats.hasChild(next)
+          duration: required number  # in millis
+          mediaUrl: required string
+          sourceUrl: string
+      beats:
+        # TODO: adjust .write to allow suggestions
+        .write: isAuthor($playKey) && prev == null
+        $beatKey:
+          .write: data.lock.userKey == userid && next.remix == prev.remix
+          lock:
+            <<: *Lock
+            .write: isEditor($playKey)
+          name: required string  # the prompt from the trove stripped of any speech markup
+          act: required number
+          remix:  # for special act intro/outro beats only
+            key: string && play.playbill.remixes.hasChild(next)
+            special: oneOf('intro', 'outro')
+          draft: boolean
+          childrenKeys: string  # comma-separated, ordered
+          kind: oneOf('choice', 'first', 'random', 'interrupt', 'suspend')  # none means 'linear'
+          thumbUrl: string
+          condition: string  # TODO: figure out condition structure
+      published:
+        timestamp: required number
+        version: required string
+        title: required string
+        publisherKey: string && isPublisher(next)
+        coverArtUrl: string
+        lowDuration: number
+        highDuration: number
+        numWords: required number
+        numRemixes: required number
+        bundleUrl: required string
+
+  trove:
+    $playKey:
       beats:
         $beatKey:
-          name: required string
-
+          prompt: required string
+          script: string
+          art: *Art
+          backgroundSound: string && root.plays[$playKey].sounds[next] != null
+          effects: string  # TODO: figure out effects structure
+          stage:
+            $castKey:
+              location: required oneOf('left', 'center', 'right')
 
   publishers:
     $publisherKey:
-      name: required string
-      people:
-        $userid:
-          role: required oneOf('editor')
+      .read: data.members[userid] != null
+      public:
+        .read: true
+        name: string
+        avatarUrl: string
+      credits:
+        # TODO: figure out how credits for running generators work; how to do rate limiting if they
+        # run out; and how to deal with unsolicited suggestions.
+        amount: number
+      members:
+        .write: data[userid].role == 'owner'
+        $userKey:
+          role: required oneOf('owner', 'editor')
 
   users:
-    $userid:
-      playsIndex:
-        .read/write: userid === $userid
-        $playKey:
-          .value: isPlay($playKey)
-          relation: required oneOf('player', 'contributor', 'author', 'editor', 'publisher')
-          archived: boolean
+    $userKey:
+      .read: userid == $userKey
+      public:
+        .read: true
+        name: string  # required to contribute or join a team
+        avatarUrl: string
+      indexes:
+        plays:
+          lastUpdateTimestamp: required number
+          contents:
+            $playKey:
+              .value: isPlay($playKey)
+              maker: oneOf('contributor', 'playtester', 'author', 'editor', 'owner')
+              publisher: boolean
+              player: boolean
+              hidden: boolean
+        publishers:
+          lastUpdateTimestamp: required number
+          contents:
+            $publisherKey:
+              .value: isPublisher($publisherKey)
+              member: boolean
       rateLimiting:
         playCreation:
           lastTimestamp: required number

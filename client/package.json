@@ -10,6 +10,8 @@
     "firebase": "8.x",
     "firetruss": "^5.0.0",
     "firetruss-worker": "^2.4.3",
+    "lodash": "^4.17.21",
+    "slugify": "^1.6.5",
     "vue": "2.x",
     "vue-router": "3.x",
     "vuetify": "^2.6.12"

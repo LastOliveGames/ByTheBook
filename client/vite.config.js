@@ -30,3 +30,7 @@ export default defineConfig({
     components({transformer: 'vue2', version: 2.7, resolvers: [vuetifyResolver()]}),
   ]
 });
+
+
+// TODO: consider enhancing all member assignments to Vue.set (and delete to Vue.delete).
+// TODO: patch Lodash so it calls the reactive versions of array methods.

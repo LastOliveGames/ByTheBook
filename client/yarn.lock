@@ -449,9 +449,9 @@ firetruss-worker@^2.4.3:
   integrity sha512-c2tre/uRGOn+pWJXGcERrX/qJmCHzq2y5nV21zkqCN/Qsb2wsk+1IX8S4iIlmmekdWzLZk4P1IFYQiVT/C687g==
 
 firetruss@^5.0.0:
-  version "5.2.7"
-  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.7.tgz#1b6b1e4b0bec377b6f01acb8b9b9d3b6b1e5a6a0"
-  integrity sha512-3UeDKC9eLicJQAjLDXkNhCjO4odPIC5B71iRpm6WKBaB4+ZkNJ7A39ty4a0u2dmy3Vl5B1njUiQ9b7DXW+vgKA==
+  version "5.2.11"
+  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.11.tgz#f99dd5bcddb1f052afecf12de9c3e083bd88edb6"
+  integrity sha512-AnuKo2SpUztYEQG4ztKeoVQUqJYvJt+KQGzghtw4VtswPg/dXyoaaD5E5QJpxVVVdYono6SMLxhGZxMk0AlJLQ==
   dependencies:
     lodash "4"
     performance-now "2"
@@ -482,7 +482,7 @@ lodash.camelcase@^4.3.0:
   resolved "https://registry.yarnpkg.com/lodash.camelcase/-/lodash.camelcase-4.3.0.tgz#b28aa6288a2b9fc651035c7711f65ab6190331a6"
   integrity sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==
 
-lodash@4:
+lodash@4, lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -579,6 +579,11 @@ safe-buffer@>=5.1.0:
   version "5.2.1"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.2.1.tgz#1eaf9fa9bdb1fdd4ec75f58f9cdb4e6b7827eec6"
   integrity sha512-rp3So07KcdmmKbGvgaNxQSJr7bGVSVk5S9Eq1F+ppbRo70+YeaDxkw5Dd8NPN+GD6bjnYm2VuPuCXmpuYvmCXQ==
+
+slugify@^1.6.5:
+  version "1.6.5"
+  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.5.tgz#c8f5c072bf2135b80703589b39a3d41451fbe8c8"
+  integrity sha512-8mo9bslnBO3tr5PEVFzMPIWwWnipGS0xVbYf65zxDqfNwmzYn1LpiKNrR6DlClusuvo+hDHd1zKpmfAe83NQSQ==
 
 source-map-js@^1.0.2:
   version "1.0.2"

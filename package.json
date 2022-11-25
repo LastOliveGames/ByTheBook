@@ -12,12 +12,14 @@
     "update": "yarn upgrade-interactive --latest"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.189",
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
     "@vitejs/plugin-vue2": "^2.0.1",
     "eslint": "^8.27.0",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-lodash": "^7.4.0",
     "eslint-plugin-vue": "^9.7.0",
     "firebase-tools": "^11.16.0",
     "fireplan": "^3.1.0",

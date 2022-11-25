@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import Truss from 'firetruss';
+import _ from 'lodash';
 
 export {Vue};
 
@@ -77,7 +78,7 @@ export function defineComponent(Class: ComponentClass, className: string, superC
     mixins: []
   };
 
-  if (Class.$vueOptions) Object.assign(component, Class.$vueOptions);
+  if (Class.$vueOptions) _.assign(component, Class.$vueOptions);
   component.props = collectPropsFromConstructor(Class);
   component.mixins.push({data(vue: Vue) {return collectDataFromConstructor(vue, Class);}});
   if (superComponent) component.extends = superComponent;
@@ -90,7 +91,7 @@ function transferProperties(Class: ComponentClass, className: string, component:
   for (const [name, descriptor] of Object.entries(descriptors)) {
     if (name === 'constructor') continue;
     if (descriptor.value) {
-      if (typeof descriptor.value !== 'function') {
+      if (!_.isFunction(descriptor.value)) {
         throw new Error(`${className}.${name} is not a function`);
       }
       if (VUE_OPTIONS.has(name)) {
@@ -117,7 +118,7 @@ function collectPropsFromConstructor(Class: ComponentClass) {
     if (Object.hasOwnProperty.call(instance, key) && placeholder instanceof PropPlaceholder) {
       let defaultValue = placeholder.defaultValue;
       // We need to clone objects and arrays used as defaults.
-      if (typeof defaultValue === 'object' && defaultValue !== null) {
+      if (_.isObject(defaultValue) && defaultValue !== null) {
         const originalValue = defaultValue;
         defaultValue = function() {return structuredClone(originalValue);};
       }
@@ -140,7 +141,8 @@ function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
       Object.defineProperty(proto, propName, descriptor);
     }
   }
-  const keys = Object.getOwnPropertyNames(vue).filter(
+  const keys = _.filter(
+    Object.getOwnPropertyNames(vue),
     key => key.charAt(0) !== '_' && Object.hasOwnProperty.call(proto, key)
   );
   if (vue.$options.props) {

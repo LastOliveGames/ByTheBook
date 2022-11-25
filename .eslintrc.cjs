@@ -5,7 +5,7 @@ module.exports = {
   parserOptions: {
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'lodash'],
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
@@ -13,6 +13,7 @@ module.exports = {
     'plugin:import/errors',
     'plugin:import/warnings',
     'plugin:import/typescript',
+    'plugin:lodash/canonical',
   ],
   rules: {
     'accessor-pairs': 'error',
@@ -146,6 +147,16 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
+
+    'lodash/chaining': ['error', 'implicit'],
+    'lodash/matches-prop-shorthand': 'off',
+    'lodash/prefer-immutable-method': 'off',
+    'lodash/prefer-invoke-map': 'off',
+    'lodash/prefer-filter': 'off',
+    'lodash/prefer-lodash-method': ['error', {ignoreMethods: ['split', 'replace']}],
+    'lodash/prefer-map': 'off',
+    'lodash/prefer-thru': 'off',
+    'lodash/prop-shorthand': 'off',
   }
 };
 
