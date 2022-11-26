@@ -25,6 +25,7 @@ types:
 
 root:
   .read/write: userid == 'server'
+  .ref: nextRoot
 
   plays:
     $playKey:
@@ -45,16 +46,36 @@ root:
           title: required string
           publisherKey: required string && isPublisher(next)
           thumbUrl: string
-        numActs: required number && next >= 1
         teaser: string
         art: &Art
           key: required string
           imageUrl: required string
           prompt: string
           generator: string
-        remixes:  # TODO: figure out how to track remixes
-          $remixKey:  # always has 'base' for the first, original mix
-            name: required string
+        moods:
+          .value: required
+          m0:
+            lo: required string
+            hi: required string
+          m1:
+            lo: required string
+            hi: required string
+          m2:
+            lo: required string
+            hi: required string
+      acts:  # updated atomically on server by editors
+        .value: required next.hasChildren()
+        $actKey:
+          ordinal: required number  # act number: 1, 2, 3, ...
+          remixes:
+            .value: next.hasChild('base')
+            # The act 1 intro beat name is used as the remix name.
+            $remixKey:
+              introBeatKey: required string && play.beats.hasChild(next)
+              # Currently the scenes beat should be the same in every remix.
+              # TODO: consider letting remixes alter their list of scenes
+              scenesBeatKey: required string && play.beats.hasChild(next)
+              outroBeatKey: required string && play.beats.hasChild(next)
       cast:
         .value: required next.hasChild('narrator')
         .write: data.lock.userKey == userid
@@ -62,18 +83,21 @@ root:
           <<: *Lock
           .write: isEditor($playKey)
         $castKey:  # always has 'narrator'
-          name: >
-            required string && ($castKey == 'narrator' ? next == 'Narrator' : true)
+          name: required string && ($castKey != 'narrator' || next == 'Narrator')
           alias: string
           voice:
             name: required string
             rate: number
             pitch: number
+          traits:
+            .value: $castKey !== 'narrator'
+            t0: string
+            t1: string
+            t2: string
           stances:
             .value: required next.hasChild('neutral')
             $stanceKey:  # always has 'neutral'
-              name: >
-                required string && ($stanceKey == 'neutral' ? next == 'neutral' : true)
+              name: required string && ($stanceKey != 'neutral' || next == 'neutral')
               inflection: string  # defaults to 'neutral'
               art: *Art
       sounds:
@@ -87,24 +111,30 @@ root:
           duration: required number  # in millis
           mediaUrl: required string
           sourceUrl: string
+      tree:
+        # Not locked -- updates must be instantaneous and transactional
+        .write: isAuthor($playKey)
+        $beatKey:
+          .value: string  # comma-separated list of ordered children beat keys
       beats:
         # TODO: adjust .write to allow suggestions
         .write: isAuthor($playKey) && prev == null
         $beatKey:
-          .write: data.lock.userKey == userid && next.remix == prev.remix
+          .write: data.lock.userKey == userid
           lock:
             <<: *Lock
             .write: isEditor($playKey)
           name: required string  # the prompt from the trove stripped of any speech markup
-          act: required number
-          remix:  # for special act intro/outro beats only
-            key: string && play.playbill.remixes.hasChild(next)
-            special: oneOf('intro', 'outro')
+          # kind: L=linear, C=choice, F=first, R=random, I=interrupt, S=suspension
+          kind: required oneOf('L', 'C', 'F', 'R', 'I', 'S')
+          repeating: boolean
           draft: boolean
-          childrenKeys: string  # comma-separated, ordered
-          kind: oneOf('choice', 'first', 'random', 'interrupt', 'suspend')  # none means 'linear'
           thumbUrl: string
-          condition: string  # TODO: figure out condition structure
+          condition:
+            clock: string && next.val().matches(/^\d+:\d+$/)  # lower and upper beat clock bounds
+            moods: string && next.val().matches(/^(-?\d+:-?\d+)?;(-?\d+:-?\d+)?;(-?\d+:-?\d+)?$/)
+            traits:
+              $castKey: string && next.val().matches(/^(\d+:\d+)?;(\d+:\d+)?;(\d+:\d+)?$/)
       published:
         timestamp: required number
         version: required string
@@ -117,15 +147,21 @@ root:
         numRemixes: required number
         bundleUrl: required string
 
+  # External store of beat data that can be loaded as-needed, to reduce bandwidth requirements when
+  # loading the core play structures.
   trove:
     $playKey:
       beats:
         $beatKey:
-          prompt: required string
+          .value: nextRoot.plays[$playKey].beats.hasChild($beatKey)
+          prompt: string
           script: string
           art: *Art
           backgroundSound: string && root.plays[$playKey].sounds[next] != null
-          effects: string  # TODO: figure out effects structure
+          effects:  # act clock auto +1 if script is non-empty; not customizable
+            moods: string && next.val().matches(/^([+-]\d+)?;([+-]\d+)?;([+-]\d+)?$/)
+            traits:
+              $castKey: string && next.val().matches(/^([+-]\d+)?;([+-]\d+)?;([+-]\d+)?$/)
           stage:
             $castKey:
               location: required oneOf('left', 'center', 'right')

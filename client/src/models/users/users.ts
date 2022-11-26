@@ -1,6 +1,8 @@
 import Truss from 'firetruss';
 import _ from 'lodash';
 import User from './users.$userid';
+import adjectives from 'codename-generator/adjectives.json';
+import nouns from 'codename-generator/nouns.json';
 
 export default class Users extends Truss.Model {
   private currentUserConnector?: Truss.Connector;
@@ -31,6 +33,15 @@ export default class Users extends Truss.Model {
   get current(): User | undefined | null {
     if (_.isNil(this.$info.userid)) return this.$info.userid;
     return this[this.$info.userid];
+  }
+
+  private get generateName() {
+    if (!this.$info.userid || !this.currentUserConnector?.ready) return false;
+    const name = `${_.capitalize(_.sample(adjectives)!)} ${_.capitalize(_.sample(nouns)!)}`;
+    this.$ref.child('users', this.$info.userid, 'public').set({
+      name, avatarUrl: `https://picsum.photos/seed/${name.replace(/ /g, '+')}/512/512`
+    });
+    return true;
   }
 
   // TODO: consider caching plays index in local storage for faster load, but it may not make much

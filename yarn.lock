@@ -2521,9 +2521,9 @@ firebase-tools@^11.16.0:
     esbuild "^0.15.7"
 
 fireplan@^3.1.0:
-  version "3.1.2"
-  resolved "https://registry.yarnpkg.com/fireplan/-/fireplan-3.1.2.tgz#1a5320089b526ab3d3c997258d45ebd939fa516f"
-  integrity sha512-BlMPApRosDCRatbYDZwmxDdifJ61GdCold9FXudj9AIiq3+Gw/HDcrgs4T7wXNwA/TIJ77D8xVKi9MBinmNWQg==
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/fireplan/-/fireplan-3.1.3.tgz#8675738372153adb3c0b6448f5974e9148c1d574"
+  integrity sha512-6v/rdJnVaR6gP7g1PzSLTEy7gxxwam2fPY89QTvIuMgo8QIw7Pk/VkQpDc3h74OGg5NPMo6CQP3o08mvfQU6lw==
   dependencies:
     clone "2"
     escodegen "2"

@@ -42,13 +42,37 @@ async function pickOrCreatePublisher(userid: string): Promise<string> {
 async function createPlayStructure(publisherKey: string, userid: string): Promise<string> {
   const playKey = db.newKey();
   await validatePlayCreationRateLimit(userid, playKey);
+  const introBeatKey = db.newKey(), scenesBeatKey = db.newKey(), outroBeatKey = db.newKey();
+  const seed = _.random(2 ** 24);
   await db.child('/plays/:playKey', {playKey}).set({
     team: {[userid]: {role: 'owner'}},
     playbill: {
-      core: {title: 'Untitled', publisherKey}, numActs: 1, remixes: {base: 'Original mix'}
+      core: {
+        title: 'Untitled', publisherKey, thumbUrl: `https://picsum.photos/seed/${seed}/128/128`
+      },
+      art: {key: 'cover', imageUrl: `https://picsum.photos/seed/${seed}/512/512`},
+      moods: {
+        m0: {lo: 'Tense', hi: 'Relaxed'},
+        m1: {lo: 'Serious', hi: 'Funny'},
+        m2: {lo: 'Mysterious', hi: 'Clear'},
+      }
     },
-    cast: {narrator: {name: 'Narrator', stances: {neutral: {name: 'neutral'}}}},
-    // TODO: create initial beats
+    acts: {
+      [db.newKey()]: {ordinal: 1, remixes: {base: {introBeatKey, scenesBeatKey, outroBeatKey}}}
+    },
+    cast: {
+      narrator: {name: 'Narrator', stances: {neutral: {name: 'neutral'}}},
+      [db.newKey()]: {
+        name: 'Hiro Protagonist', alias: 'Hiro',
+        traits: {t0: 'Bravery', t1: 'Kindness', t2: 'Perception'},
+        stances: {neutral: {name: 'neutral'}}
+      }
+    },
+    beats: {
+      [introBeatKey]: {name: 'Intro', kind: 'L'},
+      [scenesBeatKey]: {name: 'Scenes', kind: 'C', repeating: true},
+      [outroBeatKey]: {name: 'Ending', kind: 'L'}
+    }
   });
   return playKey;
 }

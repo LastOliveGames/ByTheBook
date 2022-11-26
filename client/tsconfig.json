@@ -5,6 +5,8 @@
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "strict": false,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,

@@ -7,6 +7,7 @@
     "update": "yarn upgrade-interactive --latest"
   },
   "dependencies": {
+    "codename-generator": "^1.2.0",
     "firebase": "8.x",
     "firetruss": "^5.0.0",
     "firetruss-worker": "^2.4.3",

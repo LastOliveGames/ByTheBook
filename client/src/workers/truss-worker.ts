@@ -11,7 +11,7 @@ import Fireworker from 'firetruss-worker';
 let app: ReturnType<typeof firebase.app>;
 
 Fireworker.expose(function selectApp(databaseURL) {
-  app = firebase.app(databaseURL);
+  app = firebase.app(databaseURL); // eslint-disable-line import/no-named-as-default-member
 }, 'selectApp');
 
 Fireworker.expose(function useEmulators(databaseURL) {

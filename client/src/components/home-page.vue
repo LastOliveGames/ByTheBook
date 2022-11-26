@@ -7,14 +7,14 @@
             <v-divider v-if="i > 0" :key="`${groupTitle}-divider`"/>
             <v-subheader :key="groupTitle">{{groupTitle}}</v-subheader>
             <v-list-item v-for="item in group" :key="item.playKey" @click="navigate(item)">
-              <v-list-item-avatar v-if="item.thumbUrl">
+              <v-list-item-avatar v-if="item.thumbUrl" tile>
                 <v-img :src="item.thumbUrl"/>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title>{{item.title}}</v-list-item-title>
                 <v-list-item-subtitle v-if="item.publisher">
                   by
-                  <v-avatar v-if="item.publisher.avatarUrl">
+                  <v-avatar v-if="item.publisher.avatarUrl" size="16">
                     <img :src="item.publisher.avatarUrl"/>
                   </v-avatar>
                   {{item.publisher.name}}
@@ -76,8 +76,7 @@ export default class HomePage extends Vue {
         if (!playCore) return;
         const publisher = this.$store.publishers?.[playCore.publisherKey]?.public;
         return {
-          title: playCore.title, thumbUrl: playCore.thumbUrl, playKey: playCore.$playKey,
-          relation, publisher
+          title: playCore.title, thumbUrl: playCore.thumbUrl, playKey, relation, publisher
         };
       })
       .compact()
