@@ -5,7 +5,11 @@ import NodeFire from 'nodefire';
 
 NodeFire.setCacheSize(10000);
 NodeFire.setCacheSizeForDisconnectedApp(500);
-const app = admin.initializeApp();
+const app = admin.initializeApp({
+  databaseURL: process.env.FUNCTIONS_EMULATOR ?
+    'http://localhost:9000/?ns=demo-dev-default-rtdb' :
+    'https://playwright-prod-default-rtdb.firebaseio.com'
+});
 app.options.databaseAuthVariableOverride = {uid: 'server'};
 const db = new NodeFire(admin.database().ref());
 

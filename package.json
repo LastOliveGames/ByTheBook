@@ -9,7 +9,8 @@
     "build": "cd client && vite build && cd ../functions && tsc && cd ..",
     "preview": "rm -rf firebase-export-* && firebase emulators:exec \"sleep 999d\" --project=demo-dev --import=./emulator_data --export-on-exit --ui",
     "install-all": "yarn install && yarn --cwd client install && yarn --cwd functions install",
-    "update": "yarn upgrade-interactive --latest"
+    "update": "yarn upgrade-interactive --latest",
+    "kill-emulators": "npx kill-port 9099 5001 9000 5173 9199 4000"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.189",

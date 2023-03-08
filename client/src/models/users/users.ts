@@ -25,8 +25,8 @@ export default class Users extends Truss.Model {
       this.playsIndexConnector = undefined;
       this.$truss.authenticate();
     } else if (!this.currentUserConnector) {  // should be undefined, but check just in case
-      this.currentUserConnector = this.$connect(
-        this.$store.$ref.child('users', user.uid, 'public')!);
+      console.log('signed in as uid', user.uid);
+      this.currentUserConnector = this.$connect(this.$ref.child(user.uid, 'public')!);
     }
   }
 
@@ -37,8 +37,10 @@ export default class Users extends Truss.Model {
 
   private get generateName() {
     if (!this.$info.userid || !this.currentUserConnector?.ready) return false;
+    const publicRef = this.$ref.child(this.$info.userid, 'public');
+    if (publicRef.value?.name) return false;
     const name = `${_.capitalize(_.sample(adjectives)!)} ${_.capitalize(_.sample(nouns)!)}`;
-    this.$ref.child('users', this.$info.userid, 'public').set({
+    publicRef.set({
       name, avatarUrl: `https://picsum.photos/seed/${name.replace(/ /g, '+')}/512/512`
     });
     return true;

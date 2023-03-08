@@ -2,7 +2,7 @@ import Vue from 'vue';
 import Vuetify from 'vuetify';
 import Router from 'vue-router';
 // import './style.css';
-import App from './components/app.vue';
+import App from './views/app.vue';
 import truss from ':core/truss-models';
 import router from ':core/router';
 

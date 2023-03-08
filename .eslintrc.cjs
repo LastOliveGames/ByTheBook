@@ -68,7 +68,6 @@ module.exports = {
     'no-floating-decimal': 'error',
     'no-implicit-globals': 'error',
     'no-implied-eval': 'error',
-    'no-invalid-this': 'error',
     'no-iterator': 'error',
     'no-lone-blocks': 'error',
     'no-lonely-if': 'error',
@@ -96,7 +95,6 @@ module.exports = {
     'no-unmodified-loop-condition': 'error',
     'no-unneeded-ternary': 'error',
     'no-unused-expressions': 'error',
-    'no-use-before-define': ['error', {functions: false}],
     'no-useless-call': 'error',
     'no-useless-computed-key': 'error',
     'no-useless-concat': 'error',
@@ -138,9 +136,13 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],
 
-    // These two rules need to work together for correct typescript linting.
+    // These rule pairs need to work together for correct typescript linting.
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': ['error', {args: 'none', varsIgnorePattern: '^unused'}],
+    'no-use-before-define': 'off',
+    '@typescript-eslint/no-use-before-define': ['error', {functions: false}],
+    'no-invalid-this': 'off',
+    '@typescript-eslint/no-invalid-this': 'error',
 
     // Rules turned off for now
     '@typescript-eslint/explicit-module-boundary-types': 'off',
@@ -150,6 +152,7 @@ module.exports = {
 
     'lodash/chaining': ['error', 'implicit'],
     'lodash/matches-prop-shorthand': 'off',
+    'lodash/path-style': 'off',
     'lodash/prefer-immutable-method': 'off',
     'lodash/prefer-invoke-map': 'off',
     'lodash/prefer-filter': 'off',

@@ -1,60 +1,10 @@
 import Vue from 'vue';
 import Truss from 'firetruss';
 import _ from 'lodash';
+import {prop, collectProps, isPropPlaceholder} from './props';
+import {form, collectForms, isFormPlaceholder} from './forms';
 
-export {Vue};
-
-class PropPlaceholder {
-  // eslint-disable-next-line no-useless-constructor
-  constructor(
-    readonly type: any, readonly defaultValue?: any, readonly required?: boolean,
-    readonly validator?: any
-  ) { }  // eslint-disable-line no-empty-function
-}
-
-export function prop(type, defaultValue?, required?, validator?): any {
-  return new PropPlaceholder(type, defaultValue, required, validator);
-}
-
-prop.required = {
-  string(defaultValue?: string): string {
-    return new PropPlaceholder(String, defaultValue, true) as unknown as string;
-  },
-  number(defaultValue?: number): number {
-    return new PropPlaceholder(Number, defaultValue, true) as unknown as number;
-  },
-  boolean(defaultValue?: boolean): boolean {
-    return new PropPlaceholder(Boolean, defaultValue, true) as unknown as boolean;
-  },
-  function <T>(defaultValue?: T): T {
-    return new PropPlaceholder(Function, defaultValue, true) as unknown as T;
-  },
-  object <T>(klass?: {new(): T}, defaultValue?: any): T {
-    return new PropPlaceholder(klass ?? Object, defaultValue, true) as unknown as T;
-  },
-  array <T>(defaultValue?: T[]): T[] {
-    return new PropPlaceholder(Array, defaultValue, true) as unknown as T[];
-  },
-};
-
-prop.string = function(defaultValue?: string): string {
-  return new PropPlaceholder(String, defaultValue) as unknown as string;
-};
-prop.number = function(defaultValue?: number): number {
-  return new PropPlaceholder(Number, defaultValue) as unknown as number;
-};
-prop.boolean = function(defaultValue?: boolean): boolean {
-  return new PropPlaceholder(Boolean, defaultValue) as unknown as boolean;
-};
-prop.object = function<T>(klass?: {new(): T}, defaultValue?: any): T {
-  return new PropPlaceholder(klass ?? Object, defaultValue) as unknown as T;
-};
-prop.function = function<T>(defaultValue?: T): T {
-  return new PropPlaceholder(Function, defaultValue) as unknown as T;
-};
-prop.array = function<T>(defaultValue?: T[]): T[] {
-  return new PropPlaceholder(Array, defaultValue) as unknown as T[];
-};
+export {Vue, prop, form};
 
 
 const VUE_OPTIONS = new Set([
@@ -79,7 +29,9 @@ export function defineComponent(Class: ComponentClass, className: string, superC
   };
 
   if (Class.$vueOptions) _.assign(component, Class.$vueOptions);
-  component.props = collectPropsFromConstructor(Class);
+  const instance = new Class();
+  component.props = collectProps(instance);
+  component.mixins.push({data: collectForms(instance)});
   component.mixins.push({data(vue: Vue) {return collectDataFromConstructor(vue, Class);}});
   if (superComponent) component.extends = superComponent;
   transferProperties(Class, className, component);
@@ -110,27 +62,6 @@ function transferProperties(Class: ComponentClass, className: string, component:
   }
 }
 
-function collectPropsFromConstructor(Class: ComponentClass) {
-  const props = {};
-  const instance = new Class();
-  for (const key in instance) {
-    const placeholder = instance[key];
-    if (Object.hasOwnProperty.call(instance, key) && placeholder instanceof PropPlaceholder) {
-      let defaultValue = placeholder.defaultValue;
-      // We need to clone objects and arrays used as defaults.
-      if (_.isObject(defaultValue) && defaultValue !== null) {
-        const originalValue = defaultValue;
-        defaultValue = function() {return structuredClone(originalValue);};
-      }
-      props[key] = {
-        type: placeholder.type || Object, default: defaultValue, validator: placeholder.validator,
-        required: placeholder.required
-      };
-    }
-  }
-  return props;
-}
-
 function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
   // Shim in properties from the actual Vue instance onto the component class we're instantiating
   // right now, so that the subclass's constructor can access them.
@@ -143,20 +74,18 @@ function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
   }
   const keys = _.filter(
     Object.getOwnPropertyNames(vue),
-    key => key.charAt(0) !== '_' && Object.hasOwnProperty.call(proto, key)
+    key => key.charAt(0) !== '_' && _.has(proto, key)
   );
   if (vue.$options.props) {
     for (const key in vue.$options.props) {
-      if (!Object.hasOwnProperty.call(vue, key) && !Object.hasOwnProperty.call(proto, key)) {
-        keys.push(key);
-      }
+      if (!_.has(vue, key) && !_.has(proto, key)) keys.push(key);
     }
   }
   for (const key of keys) {
     Object.defineProperty(proto, key, {
       get: () => vue[key],
       set: value => {
-        if (!(value instanceof PropPlaceholder)) vue[key] = value;
+        if (!isPropPlaceholder(value) && !isFormPlaceholder(value)) vue[key] = value;
       },
       configurable: true
     });
@@ -165,10 +94,11 @@ function collectDataFromConstructor(vue: Vue, Class: ComponentClass) {
   for (const key of keys) delete proto[key];
   const data = {};
   for (const key in instance) {
-    if (Object.hasOwnProperty.call(instance, key) && !(
-      key in vue || key === '_data' || instance[key] instanceof PropPlaceholder
+    const value = instance[key];
+    if (_.has(instance, key) && !(
+      key in vue || key === '_data' || isPropPlaceholder(value) || isFormPlaceholder(value)
     )) {
-      data[key] = instance[key];
+      data[key] = value;
     }
   }
   return data;

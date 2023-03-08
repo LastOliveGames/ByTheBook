@@ -1,8 +1,8 @@
 import Router from 'vue-router';
-import HomePage from ':components/home-page.vue';
-import PlaybillPage from ':components/playbill/playbill-page.vue';
-import PlayEditorPage from ':components/play-editor/play-editor-page.vue';
-import NotFoundPage from ':components/not-found-page.vue';
+import HomePage from ':views/home-page.vue';
+import PlaybillPage from ':views/playbill/playbill-page.vue';
+import PlayEditorPage from ':views/play-editor/play-editor-page.vue';
+import NotFoundPage from ':views/not-found-page.vue';
 
 export default new Router({
   mode: 'history',

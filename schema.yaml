@@ -6,13 +6,19 @@ functions:
   - isPlay(key): root.plays.hasChild(key)
   - isPublisher(key): root.publishers.hasChild(key)
   - isUser(userKey): root.users.hasChild(userKey)
-  - isOwner(playKey): >
-      root.plays[playKey].team[userid].role == 'owner' ||
+
+  - isPublisherOf(playKey): >
       root.publishers[root.plays[playKey].playbill.core.publisherKey].members[userid] == 'editor'
-  - isEditor(playKey): root.plays[playKey].team[userid].role == 'editor' || isOwner(playKey)
-  - isAuthor(playKey): root.plays[playKey].team[userid].role == 'author' || isEditor(playKey)
-  - isPlaytester(playKey): >
-      root.plays[playKey].team[userid].role == 'playtester' || isAuthor(playKey)
+  - isOwnerOf(playKey): root.plays[playKey].team[userid].role == 'owner' || isPublisherOf(playKey)
+  - isEditorOf(playKey): root.plays[playKey].team[userid].role == 'editor' || isOwnerOf(playKey)
+  - isAuthorOf(playKey): root.plays[playKey].team[userid].role == 'author' || isEditorOf(playKey)
+  - isTesterOf(playKey): root.plays[playKey].team[userid].role == 'tester' || isAuthorOf(playKey)
+
+  # TODO: figure out how to break locks, and what to do about lost work
+  - canWriteLock(editsAllowed): >
+      editsAllowed && prev == null && next.userKey == userid && next.timestamp == currentTimestamp ||
+      prev.userKey == next.userKey && prev.timestamp == next.timestamp ||
+      prev.userKey == userid && next == null
 
   - currentTimestamp: number && (now - next > -10000 && now - next < 10000 || userid == 'server')
   - monotonicallyIncreasing: prev == null || next >= prev || userid == 'server'
@@ -30,17 +36,17 @@ root:
   plays:
     $playKey:
       .ref: play
-      .read: isPlaytester($playKey) || isAuthor($playKey) || isEditor($playKey)
+      .read: isTesterOf($playKey)  # implied by isAuthorOf, isEditorOf, or isOwnerOf too
       team:
-        .write: isOwner($playKey)
+        .write: isOwnerOf($playKey)
         $userKey:
-          role: required oneOf('contributor', 'playtester', 'author', 'editor', 'owner')
-      playbill:
+          role: required oneOf('contributor', 'tester', 'author', 'editor', 'owner')
+      playbill: &Playbill
         .value: required
-        .write: data.lock.userKey == userid
+        .write: data.lock.userKey == userid && next.lock == null
         lock:
           <<: *Lock
-          .write: isEditor($playKey)
+          .write: canWriteLock(isEditorOf($playKey))
         core:
           .value: required
           title: required string
@@ -76,12 +82,12 @@ root:
               # TODO: consider letting remixes alter their list of scenes
               scenesBeatKey: required string && play.beats.hasChild(next)
               outroBeatKey: required string && play.beats.hasChild(next)
-      cast:
+      cast: &Cast
         .value: required next.hasChild('narrator')
-        .write: data.lock.userKey == userid
+        .write: data.lock.userKey == userid && next.lock == null
         lock:
           <<: *Lock
-          .write: isEditor($playKey)
+          .write: canWriteLock(isEditorOf($playKey))
         $castKey:  # always has 'narrator'
           name: required string && ($castKey != 'narrator' || next == 'Narrator')
           alias: string
@@ -101,40 +107,36 @@ root:
               inflection: string  # defaults to 'neutral'
               art: *Art
       sounds:
-        .write: isAuthor($playKey) && prev == null
+        .write: isAuthorOf($playKey) && prev == null
         $soundKey:
-          .write: data.lock.userKey == userid
+          .write: data.lock.userKey == userid && next.lock == null
           lock:
             <<: *Lock
-            .write: isAuthor($playKey)
+            .write: canWriteLock(isAuthorOf($playKey))
           name: required string
           duration: required number  # in millis
           mediaUrl: required string
           sourceUrl: string
       tree:
         # Not locked -- updates must be instantaneous and transactional
-        .write: isAuthor($playKey)
+        .write: isAuthorOf($playKey)
         $beatKey:
-          .value: string  # comma-separated list of ordered children beat keys
+          # comma-separated list of ordered children beat keys
+          .value: string && play.beats.hasChild($beatKey)
       beats:
         # TODO: adjust .write to allow suggestions
-        .write: isAuthor($playKey) && prev == null
-        $beatKey:
-          .write: data.lock.userKey == userid
+        .write: isAuthorOf($playKey) && prev == null
+        $beatKey: &Beat
+          .write: data.lock.userKey == userid && next.lock == null
           lock:
             <<: *Lock
-            .write: isEditor($playKey)
+            .write: canWriteLock(isAuthorOf($playKey))
           name: required string  # the prompt from the trove stripped of any speech markup
           # kind: L=linear, C=choice, F=first, R=random, I=interrupt, S=suspension
           kind: required oneOf('L', 'C', 'F', 'R', 'I', 'S')
           repeating: boolean
           draft: boolean
-          thumbUrl: string
-          condition:
-            clock: string && next.val().matches(/^\d+:\d+$/)  # lower and upper beat clock bounds
-            moods: string && next.val().matches(/^(-?\d+:-?\d+)?;(-?\d+:-?\d+)?;(-?\d+:-?\d+)?$/)
-            traits:
-              $castKey: string && next.val().matches(/^(\d+:\d+)?;(\d+:\d+)?;(\d+:\d+)?$/)
+          thumbUrl: string  # TODO: remove and blindly use well-known URL?
       published:
         timestamp: required number
         version: required string
@@ -151,13 +153,22 @@ root:
   # loading the core play structures.
   trove:
     $playKey:
-      beats:
-        $beatKey:
+      .read: isTesterOf($playKey)  # implied by isAuthorOf, isEditorOf, or isOwnerOf too
+      fatBeats:
+        $beatKey: &TroveBeat
           .value: nextRoot.plays[$playKey].beats.hasChild($beatKey)
+          .write: >
+            root.plays[$playKey].beats[$beatKey].lock.userKey == userid &&
+            nextRoot.plays[$playKey].beats[$beatKey].lock == null
           prompt: string
           script: string
           art: *Art
           backgroundSound: string && root.plays[$playKey].sounds[next] != null
+          condition:
+            clock: string && next.val().matches(/^\d+:\d+$/)  # lower and upper beat clock bounds
+            moods: string && next.val().matches(/^(-?\d+:-?\d+)?;(-?\d+:-?\d+)?;(-?\d+:-?\d+)?$/)
+            traits:
+              $castKey: string && next.val().matches(/^(\d+:\d+)?;(\d+:\d+)?;(\d+:\d+)?$/)
           effects:  # act clock auto +1 if script is non-empty; not customizable
             moods: string && next.val().matches(/^([+-]\d+)?;([+-]\d+)?;([+-]\d+)?$/)
             traits:
@@ -187,6 +198,7 @@ root:
       .read: userid == $userKey
       public:
         .read: true
+        .write: userid == $userKey
         name: string  # required to contribute or join a team
         avatarUrl: string
       indexes:
@@ -195,7 +207,7 @@ root:
           contents:
             $playKey:
               .value: isPlay($playKey)
-              maker: oneOf('contributor', 'playtester', 'author', 'editor', 'owner')
+              maker: oneOf('contributor', 'tester', 'author', 'editor', 'owner')
               publisher: boolean
               player: boolean
               hidden: boolean
@@ -209,5 +221,20 @@ root:
         playCreation:
           lastTimestamp: required number
           lastPlayKey: required string
-
-
+      edits:
+        .write: userid == $userKey
+        $playKey:
+          playbill:
+            <<: *Playbill
+            .value: "true"
+          cast:
+            <<: *Cast
+            .value: next.hasChild('narrator')
+          beats:
+            $beatKey: *Beat
+          fatBeats:
+            $beatKey: *TroveBeat
+          treeMods:
+            $beatKey:
+              parentBeatKey: required string
+              precedingBeatKeys: string  # comma-separated beat keys, nearest last

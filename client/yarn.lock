@@ -3,9 +3,9 @@
 
 
 "@babel/parser@^7.18.4":
-  version "7.20.3"
-  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.3.tgz#5358cf62e380cf69efcb87a7bb922ff88bfac6e2"
-  integrity sha512-OP/s5a94frIPXwjzEcv5S/tpQfc6XhxYUnmWpgdqMWGgYCuErA3SzozaRAMQgSZWKeTJxht9aWAkUY+0UzvOFg==
+  version "7.20.5"
+  resolved "https://registry.yarnpkg.com/@babel/parser/-/parser-7.20.5.tgz#7f3c7335fe417665d929f34ae5dceae4c04015e8"
+  integrity sha512-r27t/cy/m9uKLXQNWWebeCUHgnAZq0CpG1OwKRxzJMP1vpSU4bSIK2hq+/cp0bQxetkXx38n09rNu8jVkcK/zA==
 
 "@firebase/analytics-types@0.6.0":
   version "0.6.0"
@@ -543,9 +543,9 @@ firetruss-worker@^2.4.3:
   integrity sha512-c2tre/uRGOn+pWJXGcERrX/qJmCHzq2y5nV21zkqCN/Qsb2wsk+1IX8S4iIlmmekdWzLZk4P1IFYQiVT/C687g==
 
 firetruss@^5.0.0:
-  version "5.2.12"
-  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.12.tgz#3b653cc1e249e3a400393a434030517156c3d072"
-  integrity sha512-dansj5LnLuXE9043LIJRIaYtAAKWxgocg9MbIyVVGMquF78gccg2wffBxE5g7mV+hnu1b3U4U+0IN5/QVVleEg==
+  version "5.2.16"
+  resolved "https://registry.yarnpkg.com/firetruss/-/firetruss-5.2.16.tgz#fd6eaef1f659ff33f4fa432cfa0f1125ba159f5b"
+  integrity sha512-K+mLnwVFIulmmZClGwQNCqDlcEd/fCaFkYNQWrIzajIvDP6m+7AXxjcVGnlAgxq0VUwkxSQaf/N5Ps+Ha5Qa5w==
   dependencies:
     lodash "4"
     performance-now "2"
